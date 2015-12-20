@@ -175,16 +175,17 @@ typeset -gx -A zplugs
 # zplug utilities
 #
 
-__die() {
-    command printf -- "$@" >&2
-}
-
 __put() {
     command printf -- "$@"
 }
 
+__die() {
+    command printf -- "$@" >&2
+}
+
 __ink() {
-    local color tty=1 is_bold=false
+    local color is_bold=false
+    local -i tty=1
     local -a text
 
     while (( $# > 0 )); do
@@ -230,11 +231,10 @@ __ink() {
 }
 
 __log() {
-    local state text
+    local state text color bold
+    local -i tty
     state="$1"
     text="$2"
-
-    local bold tty=1
 
     case "$state" in
         TITLE)
@@ -289,7 +289,7 @@ __get_filter() {
 }
 
 __version_requirement() {
-    local idx
+    local -i idx
     local -a min val
 
     [[ $1 == $2 ]] && return 0
@@ -574,8 +574,6 @@ __zplug::update()
                 2)
                     # Simple manual synchronous processing
                     sleep 1
-                    # Output in magenta
-                    # and SECONDS-1 (sleep 1)
                     __put "\033[35mNot Found\033[m    %-${max}s\t(%.2fs)\n" "$line" $((SECONDS-1))
                     ;;
             esac
@@ -1212,7 +1210,6 @@ __zplug::check()
     fi
 }
 
-# WIP
 __zplug::status()
 {
     get_head_branch() {
