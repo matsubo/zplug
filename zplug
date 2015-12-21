@@ -184,15 +184,25 @@ __die() {
 }
 
 __ink() {
-    local color is_bold=false
-    local -i tty=1
-    local -a text
+    local color is_bold=false arg
+    local -i tty=1 num=0
+    local -a msg
 
     while (( $# > 0 )); do
         case "$1" in
+            --arg)
+                arg="$2"; shift
+                ;;
+            -n|--number)
+                if [[ $2 != <-> ]]; then
+                    __die "$2: must be an interger\n"
+                    return 1
+                fi
+                num="$2"; shift
+                ;;
             --color)
                 if [[ ! $2 =~ ^(black|blue|cyan|default|green|grey|magenta|red|white|yellow)$ ]]; then
-                    __die "$2: must be a color"
+                    __die "$2: must be a color\n"
                     return 1
                 fi
                 color="$2"; shift
@@ -202,13 +212,13 @@ __ink() {
                 ;;
             --tty)
                 if [[ $2 != <-> ]]; then
-                    __die "$2: must be an interger"
+                    __die "$2: must be an interger\n"
                     return 1
                 fi
                 tty="$2"; shift
                 ;;
             *)
-                text+=("$1")
+                msg+=("$1")
                 ;;
         esac
         shift
@@ -220,12 +230,17 @@ __ink() {
         color="$fg_no_bold[$color]"
     fi
 
+    if [[ $num -ne 0 ]]; then
+        msg=(${color}${msg[1,$num]}${reset_color} ${msg[$num+1,-1]})
+    else
+        msg=(${color}${msg[@]}${reset_color})
+    fi
     case $tty in
         1)
-            __put "${color}${text}${reset_color}"
+            __put "$msg" $arg
             ;;
         2)
-            __die "${color}${text}${reset_color}"
+            __die "$msg" $arg
             ;;
     esac
 }
