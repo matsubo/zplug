@@ -854,7 +854,7 @@ __zplug::load()
     local -A zspec
 
     local f ext
-    local dirname basename
+    local dirname basename parent_dir
     local src dst
     local -a src_a
     local ignore
@@ -903,9 +903,9 @@ __zplug::load()
                         if [[ ${${~zspec[on]}[1]} =~ [~$/] ]]; then
                             :
                         else
-                            parent_dir=$ZPLUG_HOME/repos
+                            parent_dir=$ZPLUG_HOME/repos/
                         fi
-                        if [[ ! -e ${parent_dir:+"${parent_dir}/"}${~zspec[on]} ]]; then
+                        if [[ ! -e ${parent_dir:+$parent_dir}${~zspec[on]} ]]; then
                             $is_verbose && __die "$zspec[name]: (not loaded)\n"
                             continue
                         fi
