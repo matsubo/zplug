@@ -1816,6 +1816,7 @@ zplug() {
         */*)
             local -i max=0
             local -a args
+            local same
             args=(${(s/, /)@:gs/,  */, })
             arg="${args[1]}"
             args[1]=()
@@ -1879,11 +1880,11 @@ zplug() {
                     tag="${tag%, }"
                     # Add to $zplugs(AA; key:"user/repo" => value:"tag:value")
                     if [[ -n ${zplugs[(I)${arg}]} ]]; then
-                        for local same in ${(k)zplugs}
+                        for same in ${(k)zplugs}
                         do
                             if [[ $same =~ ^$arg ]] && (( max < $#same )); then
-                                 max=$#same
-                                 arg="${same}@"
+                                max=$#same
+                                arg="${same}@"
                             fi
                         done
                     fi
